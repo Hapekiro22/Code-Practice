@@ -7,6 +7,8 @@
 #define WRITE 1
 #define AVAIL -1
 
+#define DEBUG 1
+
 using namespace std;
 
 struct Cache
@@ -25,6 +27,8 @@ inline cacheList *initCacheList(int cacheSize,int groupSize);
 inline cacheList **initQueueInfo(int groupSize,cacheList *cacheGroup);
 cache *isCacheHit(int MemoryAddress,int cacheSize,cacheList list);
 cache *getAvailCache(cacheList list);
+void LRU(cache *hit,cache **head,cache **tail);
+void printCache(cacheList list);
 
 
 int main()
@@ -40,57 +44,78 @@ int main()
     
     for(int i = 0;i < commandCount;i++)
     {
+        /////
+        #ifdef DEBUG
+        cout << endl << "Command " << i << endl;
+        #endif
+        /////
 
         int MemoryAddress,operation;
-        fscanf(fin, "%d %d", &MemoryAddress, &operation);
+        fscanf(fin, "%d %d", &operation, &MemoryAddress);
         int index = getCacheIndex(MemoryAddress, cacheSize, groupSize);
         cache *hit = isCacheHit(MemoryAddress, cacheSize, cacheGroup[index]);
         cache *head = *(*(queueInfo + index) + 0);
         cache *tail = *(*(queueInfo + index) + 1);
 
+        /////
+        #ifdef DEBUG
+        cout << " Memory Address: " << MemoryAddress << endl << " Operation: " << operation << endl << " Index: " << index << endl;
+        #endif
+        /////
+
         if(hit != NULL)
         {
             if(operation == READ)
             {
-                continue;
+                LRU(hit,&head,&tail);
             }
             else if(operation == WRITE)
             {
+                LRU(hit,&head,&tail);
                 hit -> operation = WRITE;
-                fprintf(fout,"%d %d\n",WRITE,MemoryAddress);
-                continue;
             }
         }
 
         else if(hit == NULL)
         {
             cache *available = getAvailCache(cacheGroup[index]);
+
+            /////
+            #ifdef DEBUG
+            cout << " Available: " << (available || 0) << endl;
+            #endif
+            /////
+
             if(available != NULL)
             {
-                available -> tag = MemoryAddress;           
+                available -> tag = MemoryAddress;
                 available -> operation = operation;
-                available -> next = head;
-                head -> prev = available;
-                available -> prev = NULL;
-                head = available;             
-                fprintf(fout,"%d %d\n",operation,MemoryAddress);
+                LRU(available,&head,&tail);           
+                fprintf(fout,"%d %d\n",READ,MemoryAddress);
             }
 
             else if(available == NULL)
             {
                 cache *victim = tail;
-                fprintf(fout,"%d %d\n",WRITE,victim -> tag);
+                if(victim -> operation == WRITE)                //如果victim之前已经写过，需要写回
+                    fprintf(fout,"%d %d\n",WRITE,victim -> tag);
                 victim -> tag = MemoryAddress;
                 victim -> operation = operation;
-                victim -> next = head;
-                head -> prev = victim;
-                head = victim;
-                tail = tail -> prev;
-                tail -> next = NULL;
-                head -> prev = NULL;
+                LRU(victim,&head,&tail);         
                 fprintf(fout,"%d %d\n",READ,MemoryAddress);
             }
         }
+
+        queueInfo[index][0] = head;
+        queueInfo[index][1] = tail;
+        cacheGroup[index] = head;
+
+        /////
+        #ifdef DEBUG
+        cout << "/////////  Cache Group " << index << "  /////////" << endl;
+        printCache(cacheGroup[index]);
+        #endif
+        /////
 
     }
 
@@ -111,7 +136,7 @@ inline cacheList *initCacheList(int cacheSize,int groupSize)
     for(int i = 0;i < groupSize;i++)
     {
         cacheGroup[i] = new Cache[cacheSize];
-        cacheGroup[i][0].tag = -1;
+        cacheGroup[i][0].tag = AVAIL;
         cacheGroup[i][0].operation = READ;
         cacheGroup[i][0].next = cacheGroup[i] + 1;
         cacheGroup[i][0].prev = NULL;
@@ -122,7 +147,7 @@ inline cacheList *initCacheList(int cacheSize,int groupSize)
             cacheGroup[i][j].next = cacheGroup[i] + j + 1;
             cacheGroup[i][j].prev = cacheGroup[i] + j - 1;
         }
-        cacheGroup[i][cacheSize - 1].tag = -1;
+        cacheGroup[i][cacheSize - 1].tag = AVAIL;
         cacheGroup[i][cacheSize - 1].operation = READ;
         cacheGroup[i][cacheSize - 1].next = NULL;
         cacheGroup[i][cacheSize - 1].prev = cacheGroup[i] + cacheSize - 2;
@@ -178,4 +203,50 @@ cache *getAvailCache(cacheList list)
     }
 
     return NULL;
+}
+
+void LRU(cache *hit,cache **h,cache **t)
+{
+    cache *head = *h;
+    cache *tail = *t;
+
+    if(hit == head)
+    {
+        return;
+    }
+
+    if(hit == tail)
+    {
+        tail = tail -> prev;
+        tail -> next = NULL;
+        hit -> next = head;
+        head -> prev = hit;
+        hit -> prev = NULL;
+        head = hit;
+        *h = head;
+        *t = tail;
+        return;
+    }
+
+    hit -> prev -> next = hit -> next;
+    hit -> next -> prev = hit -> prev;
+    hit -> next = head;
+    head -> prev = hit;
+    hit -> prev = NULL;
+    head = hit;
+    *h = head;
+    *t = tail;      
+    return;
+}
+
+void printCache(cacheList list)
+{
+    cache *current = list;
+    while(current -> next != NULL)
+    {
+        cout << "Tag: " << current -> tag << " Operation: " << current -> operation << endl;
+        current = current -> next;
+    }
+    cout << "Tag: " << current -> tag << " Operation: " << current -> operation << endl;
+    return;
 }
