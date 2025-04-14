@@ -1,0 +1,1 @@
+cmake -B build; if ($?) { cmake --build build }
