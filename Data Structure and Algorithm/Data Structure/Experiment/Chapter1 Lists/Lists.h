@@ -283,12 +283,12 @@ status ListTraverse(SqList L)
         return OK;
     }
 
-    return -1;
+    return INFEASIBLE;
 
     /********** End **********/
 }
 
-status  SaveList(SqList L,char FileName[])
+status SaveList(SqList L,char FileName[])
 // 如果线性表L存在，将线性表L的的元素写到FileName文件中，返回OK，否则返回INFEASIBLE。
 {
     // 请在这里补充代码，完成本关任务
