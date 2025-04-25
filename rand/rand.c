@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define BASE 3
+#define BASE 2
 
 int main()
 {
@@ -10,7 +10,7 @@ int main()
     printf("%d", rand() % BASE);
     return 0;
 }
-//1 = Guitar
-//2 = Game
-//0 = again
+//1 = 爪刀
+//2 = 能量剑
+//0 = 匕首
 
