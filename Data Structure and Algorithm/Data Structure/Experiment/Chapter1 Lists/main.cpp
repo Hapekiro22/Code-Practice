@@ -23,7 +23,7 @@ void main(void){
       printf("    	  3. ClearList      9. NextElem \n");
       printf("    	  4. ListEmpty      10. ListInsert\n");
       printf("    	  5. ListLength     11. ListDelete\n");
-      printf("    	  6. GetElem        12. ListTrabverse\n");
+      printf("    	  6. GetElem        12. InitSequenceList\n");
       printf("-------------------------------------------------\n\n");
       printf("      Menu for Add-on lists function");
       printf("-------------------------------------------------\n");
