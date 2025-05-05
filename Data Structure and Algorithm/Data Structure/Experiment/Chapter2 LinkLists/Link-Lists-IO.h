@@ -43,6 +43,8 @@ status LoadList(LinkList *L, char FileName[])
     if(fin == NULL)
         return ERROR;
     
+    DestroyList(L);  // 销毁原有链表
+    
     // 创建头节点
     *L = (LinkList)malloc(sizeof(LNode));
     if(*L == NULL) {

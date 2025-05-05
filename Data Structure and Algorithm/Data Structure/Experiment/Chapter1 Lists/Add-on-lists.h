@@ -26,7 +26,7 @@ ElemType MaxSubArray(SqList* L)
         }
     }
 
-    free(sub_sum); M,
+    free(sub_sum); 
     return max_sum;
 }
 
