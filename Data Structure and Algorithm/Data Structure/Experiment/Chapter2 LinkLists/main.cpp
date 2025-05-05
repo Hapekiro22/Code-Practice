@@ -44,6 +44,7 @@ int main()
                 printf("-------------------------------------------------\n"); 
                 if(Lists.elem[list_idx] == NULL )
                 {
+                    L_operated = NULL;
                     printf("                          No lists exist!\n");
                     printf("-------------------------------------------------\n");
                 }
@@ -122,7 +123,7 @@ int main()
                 break;
             }
 
-            if(mode == 2 && op != 18 && L_operated == NULL)
+            if(mode == 2 && op != 18 && op != 20 && op != 22 && L_operated == NULL)
             {
                 printf("No list exists! Please create a list first.\n");
                 op = 1; // 重置操作码

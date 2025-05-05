@@ -9,6 +9,14 @@ status AddList(LISTS *Lists, char ListName[])
     /********** Begin *********/
     int idx = Lists->length;
    // printf("idx=%d\n",idx);
+    //check if the name is already in the list
+    for(int i = 0; i < idx; i++)
+    {
+        if(!strcmp(Lists->elem[i].name, ListName))
+        fprintf(stderr, "List %s already exists\n", ListName);
+        return ERROR;
+    }
+
     strcpy(Lists->elem[idx].name, ListName);
 
     Lists->elem[idx].L.elem = NULL;
