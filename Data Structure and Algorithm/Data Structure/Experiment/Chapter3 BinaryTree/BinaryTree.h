@@ -132,6 +132,40 @@ BiTNode* LocateNode(BiTree T,KeyType e)
     /********** End **********/
 }
 
+BiTNode* GetParent(BiTree T, KeyType e)
+//查找关键字为e的节点的父节点
+{
+    // 空树或根节点没有父节点
+    if(T == NULL) 
+        return NULL;
+    
+    // 检查当前节点的左子节点
+    if(T->lchild != NULL && T->lchild->data.key == e)
+        return T;  // 找到了，返回父节点
+    
+    // 检查当前节点的右子节点
+    if(T->rchild != NULL && T->rchild->data.key == e)
+        return T;  // 找到了，返回父节点
+    
+    // 在左子树中递归查找
+    BiTNode* parent = NULL;
+    if(T->lchild != NULL) {
+        parent = GetParent(T->lchild, e);
+        if(parent != NULL)
+            return parent;  // 在左子树中找到了父节点
+    }
+    
+    // 在右子树中递归查找
+    if(T->rchild != NULL) {
+        parent = GetParent(T->rchild, e);
+        if(parent != NULL)
+            return parent;  // 在右子树中找到了父节点
+    }
+    
+    // 如果左右子树都没找到，返回NULL
+    return NULL;
+}
+
 status Assign(BiTree &T, KeyType e, TElemType value)
 //实现结点赋值。此题允许通过增加其它函数辅助实现本关任务
 {
@@ -182,4 +216,116 @@ BiTNode* GetSibling(BiTree T, KeyType e)
     
     return sibling;
     /********** End **********/
+}
+
+status InsertNode(BiTree &T, KeyType e, int LR, TElemType c)
+{
+    // 特殊情况：插入作为根节点
+    if(LR == -1)
+    {
+        BiTNode* newNode = (BiTNode*)malloc(sizeof(BiTNode));
+        if(newNode == NULL) return ERROR;
+        newNode->data = c;
+        newNode->lchild = NULL;
+        newNode->rchild = T;  // 原树作为右子树
+        T = newNode;
+        return OK;
+    }
+
+    if(HasSameKey(T, c.key, NULL)) return ERROR;
+
+    BiTNode *basicNode = LocateNode(T, e);
+    if(basicNode == NULL) return ERROR;
+    
+    BiTNode* newNode = (BiTNode*)malloc(sizeof(BiTNode));
+    if(newNode == NULL) return ERROR;
+    newNode->data = c;
+    newNode->lchild = NULL;
+    newNode->rchild = NULL;
+
+    // 插入到左子树
+    if(LR == 0)
+    {
+        // 若原左子树存在，则保存它
+        BiTNode* originalLeft = basicNode->lchild;
+        
+        basicNode->lchild = newNode;
+        
+        if(originalLeft != NULL) {
+            newNode->rchild = originalLeft;
+        }
+    }
+    // 插入到右子树
+    else if(LR == 1)
+    {
+        // 若原右子树存在，则保存它
+        BiTNode* originalRight = basicNode->rchild;
+        
+        basicNode->rchild = newNode;
+        
+        if(originalRight != NULL) {
+            newNode->rchild = originalRight;
+        }
+    }
+    else
+        return ERROR; // 无效的LR值
+
+    return OK;
+}
+
+status DeleteNode(BiTree &T, KeyType e)
+{
+    BiTNode *nodeToDelete = LocateNode(T, e);
+    if(nodeToDelete == NULL) return ERROR;
+
+    BiTNode *parent = GetParent(T, e);
+    if(parent == NULL) return ERROR; // 根节点没有父节点，无法删除
+
+    status position = 0; // 0表示左子树，1表示右子树
+    if(parent->rchild == nodeToDelete) position = 1;
+
+    BiTNode *lchild = nodeToDelete->lchild;
+    BiTNode *rchild = nodeToDelete->rchild;
+
+    if(lchild != NULL && rchild != NULL)
+    {
+        BiTNode *LC_most_right = lchild;
+        while(LC_most_right->rchild != NULL)
+            LC_most_right = LC_most_right->rchild;
+        LC_most_right->rchild = rchild;     // 将右子树连接到左子树的最右节点
+
+        if(position == 0)
+            parent->lchild = lchild; // 将左子树连接到父节点
+        else
+            parent->rchild = lchild; // 将左子树连接到父节点
+        
+    }
+
+    else if(lchild != NULL && rchild == NULL)
+    {
+        if(position == 0)
+            parent->lchild = lchild; // 将左子树连接到父节点
+        else
+            parent->rchild = lchild; // 将左子树连接到父节点
+    }
+    else if(lchild == NULL && rchild != NULL)
+    {
+        if(position == 0)
+            parent->lchild = rchild; // 将右子树连接到父节点
+        else
+            parent->rchild = rchild; // 将右子树连接到父节点
+    }
+    else
+    {
+        if(position == 0)
+            parent->lchild = NULL; // 删除左子树
+        else
+            parent->rchild = NULL; // 删除右子树
+    }
+
+    free(nodeToDelete);
+    nodeToDelete = NULL; 
+
+    return OK;
+
 }
