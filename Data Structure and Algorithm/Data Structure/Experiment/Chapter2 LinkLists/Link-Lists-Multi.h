@@ -36,6 +36,21 @@ status DestroyMultiLists(LISTS Lists)
     return OK;
 }
 
+status CheckDuplicate(LISTS Lists, char *ListName)
+{
+    // 检查Lists中是否存在名称为ListName的线性表，存在返回TRUE，否则返回FALSE
+    if(Lists.elem == NULL)
+        return INFEASIBLE;
+    
+    for(int i = 0; i < Lists.length; i++)
+    {
+        if(strcmp(Lists.name[i], ListName) == 0)
+            return TRUE;
+    }
+    
+    return FALSE;
+}
+
 status AddList(LISTS *Lists, char *ListName)
 {
     
@@ -44,6 +59,10 @@ status AddList(LISTS *Lists, char *ListName)
     
     if(Lists->length == MAX_LISTS_NUM)
         return OVERFLOW;
+
+    //check if the list name already exists
+    if(CheckDuplicate(*Lists, ListName) == TRUE)
+        return ERROR;
     
     printf("Add the list %s, list id: %d\n", ListName, Lists->length + 1);   
     strcpy(Lists->name[Lists->length] ,ListName);
