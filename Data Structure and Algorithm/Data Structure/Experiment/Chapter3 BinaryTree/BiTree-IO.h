@@ -1,12 +1,13 @@
-#include "BiTree-Traverse.h"
-
 // 全局文件指针
 FILE *g_outFile = NULL;
 
 // 节点访问函数
 void SaveNode(BiTree node)
 {
-    fprintf(g_outFile, "%d %s\n", node->data.key, node->data.others);
+    if(node == NULL)
+        fprintf(g_outFile, "0 null  ");
+    else
+        fprintf(g_outFile, "%d %s  ", node->data.key, node->data.others);
 }
 
 status SaveBiTree(BiTree T, char FileName[])
@@ -28,7 +29,8 @@ status SaveBiTree(BiTree T, char FileName[])
     return OK;
 }
 
-status LoadBiTree(BiTree &T, char FileName[])  
+status LoadBiTree(BiTree *T, char FileName[])  // 修改为指针参数
+
 {
     FILE *fin = fopen(FileName, "r");
     if(fin == NULL)
@@ -36,15 +38,15 @@ status LoadBiTree(BiTree &T, char FileName[])
 
     TElemType definition[128]; // 假设最多128个节点
     int i = 0;
-    while(fscanf(fin, "%d %s", &definition[i].key, definition[i].others) != EOF)
-    {
-        i++;
-    }
+    do {
+        fscanf(fin,"%d%s",&definition[i].key,definition[i].others);
+    } while (definition[i++].key!=-1);
     fclose(fin);
-
+ 
     // 重新构建二叉树
-    T = NULL;
-    CreateBiTree(T, definition);
+    *T = NULL;  // 使用指针访问
+    CreateBiTree_Pre(T, definition);  // 直接传递指针
+    //printf("%d %s\n", (*T)->lchild->data.key, (*T)->lchild->data.others); // 输出根节点信息
 
     return OK;
 }
