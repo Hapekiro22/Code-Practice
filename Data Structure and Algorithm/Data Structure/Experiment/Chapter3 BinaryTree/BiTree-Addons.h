@@ -1,22 +1,15 @@
-#include "BinaryTree.h"
 
 //获取T的最大根节点到叶节点的key值和（一条路径）
-int MaxPath(BiTree T, int *maxPath)
+int MaxPath(BiTree T)
 {
     if (T == NULL) return 0; // 空树返回0
 
-    int leftMax = MaxPath(T->lchild, maxPath); // 左子树的最大路径和
-    int rightMax = MaxPath(T->rchild, maxPath); // 右子树的最大路径和
+    // 计算左子树和右子树的最大路径和
+    int leftMax = MaxPath(T->lchild);
+    int rightMax = MaxPath(T->rchild);
 
-    // 更新当前节点的路径和
-    int currentMax = T->data.key + (leftMax > rightMax ? leftMax : rightMax);
-
-    // 更新全局最大路径和
-    if (currentMax > *maxPath) {
-        *maxPath = currentMax;
-    }
-
-    return currentMax;
+    // 返回当前节点的值加上左右子树的最大路径和
+    return T->data.key + (leftMax > rightMax ? leftMax : rightMax);
 }
 
 BiTNode* LowestCommonAncestor(BiTree T, KeyType e1, KeyType e2)

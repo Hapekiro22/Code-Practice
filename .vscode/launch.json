@@ -10,7 +10,7 @@
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "gdb",
             "miDebuggerPath": "D:\\Programming\\Tools\\IDE For VSC\\Winlibs\\mingw64\\bin\\gdb.exe",  // 根据你的WinLibs安装路径修改
             "setupCommands": [

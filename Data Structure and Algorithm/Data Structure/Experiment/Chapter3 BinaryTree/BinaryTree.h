@@ -1,7 +1,6 @@
-#include "def.h"
 
 // 全局变量，用于跟踪前序遍历序列的当前位置
-int count = 0;
+int count_def = 0;
 
 // 辅助函数：检查二叉树中是否存在相同关键字，但排除当前节点自身
 status HasSameKey(BiTree T, KeyType key, BiTree currentNode) {
@@ -17,14 +16,16 @@ status HasSameKey(BiTree T, KeyType key, BiTree currentNode) {
     return FALSE;
 }
 
-status CreateBiTree(BiTree &T, TElemType definition[]) 
+status CreateBiTree_Pre(BiTree *T, TElemType definition[]) 
 /*根据带空枝的二叉树先根遍历序列definition构造一棵二叉树，将根节点指针赋值给T并返回OK，
 如果有相同的关键字，返回ERROR。此题允许通过增加其它函数辅助实现本关任务*/
 {
+    if(*T != NULL) return INFEASIBLE; // 如果树已经存在，返回错误
+
     // 处理空节点标记（假设definition中的key为0表示空节点）
-    if (definition[count].key == 0) {
-        T = NULL;
-        count++;
+    if (definition[count_def].key == 0) {
+        *T = NULL;
+        count_def++;
         return OK;
     }
     
@@ -32,39 +33,66 @@ status CreateBiTree(BiTree &T, TElemType definition[])
     static BiTree root = NULL;
     
     // 第一个节点时初始化根指针
-    if (count == 0) {
+    if (count_def == 0) {
         root = NULL;
     }
     
     // 分配新节点
-    T = (BiTNode *)malloc(sizeof(BiTNode));
-    if (!T) return ERROR; // 内存分配失败
+    *T = (BiTNode *)malloc(sizeof(BiTNode));
+    if (!(*T)) return ERROR; // 内存分配失败
+
+    (*T) -> lchild = NULL; // 初始化左子树
+    (*T) -> rchild = NULL; // 初始化右子树
     
     // 设置节点数据
-    T->data = definition[count];
+    (*T)->data = definition[count_def];
     
     // 检查树中是否已存在相同关键字
     // 第一个节点时，root为空，设置root
     if (root == NULL) {
-        root = T;
+        root = *T;
     } 
-    else if (HasSameKey(root, T->data.key, T)) {  // 传入当前节点T以便排除自身
-        free(T); // 释放已分配的内存
-        T = NULL;
+    else if (HasSameKey(root, (*T)->data.key, *T)) {  // 传入当前节点T以便排除自身
+        free(*T); // 释放已分配的内存
+        *T = NULL;
         return ERROR; // 存在相同关键字，返回错误
     }
     
     // 递增count，准备读取下一个节点
-    count++;
+    count_def++;
     
     // 递归构建左子树
-    status leftStatus = CreateBiTree(T->lchild, definition);
+    status leftStatus = CreateBiTree_Pre(&((*T)->lchild), definition);
     if (leftStatus == ERROR) return ERROR;
     
     // 递归构建右子树
-    status rightStatus = CreateBiTree(T->rchild, definition);
+    status rightStatus = CreateBiTree_Pre(&((*T)->rchild), definition);
     if (rightStatus == ERROR) return ERROR;
     
+    return OK;
+}
+
+typedef struct {
+    int pos;
+    TElemType data;
+} DEF;
+
+status CreateBiTree(BiTree *T,DEF definition[])
+{
+    int i=0,j;
+    static BiTNode *p[100];
+    while (j=definition[i].pos)
+    {
+       p[j]=(BiTNode *)malloc(sizeof(BiTNode));
+       p[j]->data=definition[i].data;
+       p[j]->lchild=NULL;
+       p[j]->rchild=NULL;
+       if (j!=1)
+       		if (j%2)   p[j/2]->rchild=p[j];  
+       	   else      p[j/2]->lchild=p[j];
+       i++;
+    }
+    *T=p[1];
     return OK;
 }
 
@@ -85,6 +113,19 @@ status ClearBiTree(BiTree *T)
     *T = NULL;
 
     return OK;
+    /********** End **********/
+}
+
+
+bool BiTreeEmpty(BiTree T)
+//判断二叉树是否为空
+{
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    if(T == NULL)
+        return true;
+    else
+        return false;
     /********** End **********/
 }
 
@@ -166,20 +207,20 @@ BiTNode* GetParent(BiTree T, KeyType e)
     return NULL;
 }
 
-status Assign(BiTree &T, KeyType e, TElemType value)
+status Assign(BiTree *T, KeyType e, TElemType value)
 //实现结点赋值。此题允许通过增加其它函数辅助实现本关任务
 {
     // 请在这里补充代码，完成本关任务
     /********** Begin *********/
-    if (T == NULL) return ERROR;
+    if (*T == NULL) return ERROR;
     
     if (e != value.key) {
-        if (HasSameKey(T, value.key, NULL)) {
+        if (HasSameKey(*T, value.key, NULL)) {
             return ERROR;
         }
     }
     
-    BiTNode *node = LocateNode(T, e);
+    BiTNode *node = LocateNode(*T, e);
     
     if (node == NULL) return ERROR;
     
@@ -188,6 +229,7 @@ status Assign(BiTree &T, KeyType e, TElemType value)
     return OK;
     /********** End **********/
 }
+
 
 
 BiTNode* GetSibling(BiTree T, KeyType e)
@@ -218,7 +260,7 @@ BiTNode* GetSibling(BiTree T, KeyType e)
     /********** End **********/
 }
 
-status InsertNode(BiTree &T, KeyType e, int LR, TElemType c)
+status InsertNode(BiTree *T, KeyType e, int LR, TElemType c)
 {
     // 特殊情况：插入作为根节点
     if(LR == -1)
@@ -227,14 +269,14 @@ status InsertNode(BiTree &T, KeyType e, int LR, TElemType c)
         if(newNode == NULL) return ERROR;
         newNode->data = c;
         newNode->lchild = NULL;
-        newNode->rchild = T;  // 原树作为右子树
-        T = newNode;
+        newNode->rchild = *T;  // 原树作为右子树
+        *T = newNode;
         return OK;
     }
 
-    if(HasSameKey(T, c.key, NULL)) return ERROR;
+    if(HasSameKey(*T, c.key, NULL)) return ERROR;
 
-    BiTNode *basicNode = LocateNode(T, e);
+    BiTNode *basicNode = LocateNode(*T, e);
     if(basicNode == NULL) return ERROR;
     
     BiTNode* newNode = (BiTNode*)malloc(sizeof(BiTNode));
@@ -273,13 +315,104 @@ status InsertNode(BiTree &T, KeyType e, int LR, TElemType c)
     return OK;
 }
 
-status DeleteNode(BiTree &T, KeyType e)
+status DeleteNode(BiTree *T, KeyType e)
+{
+    BiTNode *nodeToDelete = LocateNode(*T, e);
+    if(nodeToDelete == NULL) return ERROR;
+
+    BiTNode *parent = GetParent(*T, e);
+    if(parent == NULL) return ERROR; // 根节点没有父节点，无法删除
+
+    status position = 0; // 0表示左子树，1表示右子树
+    if(parent->rchild == nodeToDelete) position = 1;
+
+    BiTNode *lchild = nodeToDelete->lchild;
+    BiTNode *rchild = nodeToDelete->rchild;
+
+    if(lchild != NULL && rchild != NULL)
+    {
+        BiTNode *LC_most_right = lchild;
+        while(LC_most_right->rchild != NULL)
+            LC_most_right = LC_most_right->rchild;
+        LC_most_right->rchild = rchild;     // 将右子树连接到左子树的最右节点
+
+        if(position == 0)
+            parent->lchild = lchild; // 将左子树连接到父节点
+        else
+            parent->rchild = lchild; // 将左子树连接到父节点
+    }
+    else if(lchild != NULL && rchild == NULL)
+    {
+        if(position == 0)
+            parent->lchild = lchild; // 将左子树连接到父节点
+        else
+            parent->rchild = lchild; // 将左子树连接到父节点
+    }
+    else if(lchild == NULL && rchild != NULL)
+    {
+        if(position == 0)
+            parent->lchild = rchild; // 将右子树连接到父节点
+        else
+            parent->rchild = rchild; // 将右子树连接到父节点
+    }
+    else
+    {
+        if(position == 0)
+            parent->lchild = NULL; // 删除左子树
+        else
+            parent->rchild = NULL; // 删除右子树
+    }
+
+    free(nodeToDelete);
+    nodeToDelete = NULL; 
+
+    return OK;
+}
+
+
+status DeleteNode_HeadA(BiTree &T, KeyType e)
 {
     BiTNode *nodeToDelete = LocateNode(T, e);
     if(nodeToDelete == NULL) return ERROR;
 
     BiTNode *parent = GetParent(T, e);
-    if(parent == NULL) return ERROR; // 根节点没有父节点，无法删除
+    // 处理根节点的特殊情况
+    if(parent == NULL) {
+        // 确认是根节点
+        if(nodeToDelete != T) return ERROR;
+        
+        BiTNode *lchild = nodeToDelete->lchild;
+        BiTNode *rchild = nodeToDelete->rchild;
+        
+        // 情况1：根节点有两个子节点
+        if(lchild != NULL && rchild != NULL) {
+            // 找到左子树的最右节点
+            BiTNode *LC_most_right = lchild;
+            while(LC_most_right->rchild != NULL)
+                LC_most_right = LC_most_right->rchild;
+            
+            // 将右子树接到左子树最右节点的右子树
+            LC_most_right->rchild = rchild;
+            
+            // 用左子树替换根节点
+            T = lchild;
+        }
+        // 情况2：根节点只有左子树
+        else if(lchild != NULL) {
+            T = lchild;
+        }
+        // 情况3：根节点只有右子树
+        else if(rchild != NULL) {
+            T = rchild;
+        }
+        // 情况4：根节点是叶子节点
+        else {
+            T = NULL;
+        }
+
+        free(nodeToDelete);
+        return OK;
+    }
 
     status position = 0; // 0表示左子树，1表示右子树
     if(parent->rchild == nodeToDelete) position = 1;
