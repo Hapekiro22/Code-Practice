@@ -1,4 +1,3 @@
-#include "BinaryTree.h"
 
 // 递归实现先序遍历
 status PreOrderTraverse(BiTree T, void (*visit)(BiTree))
@@ -9,6 +8,9 @@ status PreOrderTraverse(BiTree T, void (*visit)(BiTree))
         PreOrderTraverse(T->lchild, visit);    // 先序遍历左子树
         PreOrderTraverse(T->rchild, visit);    // 先序遍历右子树
     }
+    else    
+        visit(NULL);                        // 访问空节点
+        
     return OK;
 }
 
@@ -20,6 +22,8 @@ status InOrderTraverse(BiTree T, void (*visit)(BiTree))
         visit(T);                              // 访问根节点
         InOrderTraverse(T->rchild, visit);     // 中序遍历右子树
     }
+    else
+        visit(NULL);                        // 访问空节点
     return OK;
 }
 
@@ -31,6 +35,8 @@ status PostOrderTraverse(BiTree T, void (*visit)(BiTree))
         PostOrderTraverse(T->rchild, visit);   // 后序遍历右子树
         visit(T);                              // 访问根节点
     }
+    else
+        visit(NULL);                        // 访问空节点
     return OK;
 }
 
@@ -63,4 +69,40 @@ status LevelOrderTraverse(BiTree T, void (*visit)(BiTree))
     }
     
     return OK;
+}
+
+status PreOrderTraverse_Stack(BiTree T, void (*visit)(BiTree))
+{
+    if(T == NULL) return OK; // 空树直接返回
+    
+    BiTree stack[128]; // 假设MAX_TREE_SIZE是预定义的足够大小
+    int top = -1; // 栈顶指针
+    
+    // 根节点入栈
+    stack[++top] = T;
+    
+    while(top >= 0)
+    {
+        // 出栈一个节点并访问
+        BiTree node = stack[top--];
+        visit(node);
+        
+        // 右子节点先入栈，左子节点后入栈
+        if(node->rchild != NULL)
+            stack[++top] = node->rchild;
+        if(node->lchild != NULL)
+            stack[++top] = node->lchild;
+    }
+    
+    return OK;
+}
+
+void ShowNode(BiTree T)
+{
+    if(T != NULL)
+        printf("%d,%s ", T->data.key, T->data.others); // 显示节点信息
+    else;
+
+    return;
+       // printf("null "); // 显示空节点
 }
