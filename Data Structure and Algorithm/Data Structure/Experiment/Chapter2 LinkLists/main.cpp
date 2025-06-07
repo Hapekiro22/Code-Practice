@@ -17,6 +17,10 @@ int main()
     InitMultiLists(&Lists);
     int list_idx = 0;
     int loc_idx = 0;
+    int length = 0;
+    int n;
+
+    ElemType deletedElem;
 
     char fileName[30];
     char Lists_name[30];
@@ -39,30 +43,30 @@ int main()
             if(mode == 2)
             {
                 system("cls");    printf("\n\n");
-                printf("-------------------------------------------------\n");
+                printf("-------------------------------------------------------\n");
                 printf("          Multi-Lists Operation Mode:\n");
-                printf("-------------------------------------------------\n"); 
+                printf("-------------------------------------------------------\n"); 
                 if(Lists.elem[list_idx] == NULL )
                 {
                     L_operated = NULL;
                     printf("                          No lists exist!\n");
-                    printf("-------------------------------------------------\n");
+                    printf("-------------------------------------------------------\n");
                 }
                 else
                 {
                     L_operated = &Lists.elem[list_idx];
                     printf("                  Current list: %s", Lists.name[list_idx]);
                     printf("    List id: %d\n", list_idx + 1);
-                    printf("-------------------------------------------------\n");
+                    printf("-------------------------------------------------------\n");
                 }
             }
             else if(mode == 1)
             {
                 L_operated = &L_single;
                 system("cls");    printf("\n\n");
-                printf("-------------------------------------------------\n");
+                printf("-------------------------------------------------------\n");
                 printf("          Single-Lists Operation Mode:\n");
-                printf("-------------------------------------------------\n"); 
+                printf("-------------------------------------------------------\n"); 
             }
             else if(mode == 0)
             {
@@ -98,7 +102,7 @@ int main()
             printf("           Additional Functions\n");
             printf("--------------------------------------------------------\n");
             printf("    	  15. ReverseList   16. SortList\n");
-            printf("          17. InitSequenceList\n");
+            printf("          17. DeleteNodeFromEnd\n");
 
             // 只在多链表模式才显示多链表操作
             if (mode == 2) {
@@ -165,10 +169,10 @@ int main()
                     break;
                 
                 case 5:
-                    if((list_idx = ListLength(L_operated)) == INFEASIBLE)
+                    if((length = ListLength(L_operated)) == INFEASIBLE)
                         printf("The list does not exist!\n");
                     else
-                        printf("The length of the list is %d\n", list_idx);
+                        printf("The length of the list is %d\n", length);
                     break;
                 
                 case 6:
@@ -269,11 +273,12 @@ int main()
                     break;
                 
                 case 17:
-                    printf("Enter a sequence of elements (end with 0): ");
-                    if(InitSequenceLists(L_operated) == OK)
-                        printf("InitSequenceList successfully!\n");
+                    printf("Please input the value of n to delete the nth node from the end: ");
+                    scanf("%d", &n);
+                    if((deletedElem = DeleteNodefromEnd(L_operated, n)) != ERROR)
+                        printf("DeleteNodeFromEnd successfully! Deleted element: %d\n", deletedElem);
                     else
-                        printf("InitSequenceList failed!\n");
+                        printf("DeleteNodeFromEnd failed!\n");
                     break;
                 
                 case 18:

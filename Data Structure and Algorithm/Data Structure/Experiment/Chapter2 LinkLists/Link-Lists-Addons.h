@@ -71,33 +71,38 @@ status reverseList(LinkList *L)
 
 int DeleteNodefromEnd(LinkList *L, int n)
 {
-    //返回倒数第n个节点的值
-
     if(*L == NULL || (*L)->next == NULL)
         return INFEASIBLE;
     
-    LNode *current = (*L)->next;
-    LNode *fast = (*L)->next;
-    for(int count = 0; count < n && fast != NULL; count++)
+    if(n <= 0)
+        return ERROR; // 添加参数检查
+    
+    LNode *dummy = *L; // 使用头节点作为虚拟节点
+    LNode *fast = dummy;
+    LNode *slow = dummy;
+    
+    // fast先走n步（注意是n而非n-1）
+    for(int i = 0; i < n; i++)
     {
+        if(fast->next == NULL)
+            return ERROR; // n大于链表长度
         fast = fast->next;
     }
-
-    if(fast == NULL)
-        return ERROR; // n大于链表长度
-
-    while(fast != NULL)
+    
+    // fast和slow一起走，直到fast到达链表末尾
+    while(fast->next != NULL)
     {
-        current = current->next;
+        slow = slow->next;
         fast = fast->next;
     }
-
-    ElemType e = current->data; // 倒数第n个节点的值
-    LNode *temp = current->next; // 保存要删除的节点
-    current->next = current->next->next; // 删除节点
-    free(temp); // 释放内存
-
-    return e; 
+    
+    // 此时slow指向要删除节点的前一个节点
+    ElemType e = slow->next->data; // 要删除节点的值
+    LNode *temp = slow->next;
+    slow->next = slow->next->next;
+    free(temp);
+    
+    return e;
 }
 
 status SortList(LinkList *L)

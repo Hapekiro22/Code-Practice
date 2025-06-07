@@ -1,4 +1,3 @@
-#include "def.h"
 
 int GetLocation(ALGraph &G, KeyType key)
 {
@@ -155,6 +154,48 @@ int NextAdjVex(ALGraph G,KeyType v,KeyType w)
         p = p -> nextarc;
     }
 
+=======
+    }
+
+    G.vertices[i].data = value;
+    return OK;
+
+    /********** End **********/
+}
+
+int FirstAdjVex(ALGraph G,KeyType u)
+//根据u在图G中查找顶点，查找成功返回顶点u的第一邻接顶点位序，否则返回-1；
+{
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    int i = GetLocation(G, u);
+    if(i == -1) return -1;
+
+    ArcNode *p = G.vertices[i].firstarc;
+    if(p == NULL) return -1;
+
+    return p -> adjvex;
+
+    /********** End **********/
+}
+
+int NextAdjVex(ALGraph G,KeyType v,KeyType w)
+//v对应G的一个顶点,w对应v的邻接顶点；操作结果是返回v的（相对于w）下一个邻接顶点的位序；如果w是最后一个邻接顶点，或v、w对应顶点不存在，则返回-1。
+{
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    int i = GetLocation(G, v);
+    int j = GetLocation(G, w);
+    if(i == -1) return -1;
+
+    ArcNode *p = G.vertices[i].firstarc;
+    while(p != NULL)
+    {
+        if(p -> adjvex == j)
+            break;
+        p = p -> nextarc;
+    }
+
     if(p == NULL || p -> nextarc == NULL) return -1;
   
     return p -> nextarc -> adjvex;
@@ -208,7 +249,7 @@ status DeleteVex(ALGraph &G, KeyType u)
         if(j == i) continue;  // 跳过被删除的顶点
         
         ArcNode *p1 = G.vertices[j].firstarc;
-        ArcNode *p2 = NULL;
+        ArcNode *p2 = NULL; 
 
         while(p1 != NULL)
         {
@@ -368,8 +409,135 @@ status DeleteArc(ALGraph &G,KeyType v,KeyType w)
     /********** End **********/
 }
 
-status DFSTraverse(ALGraph &G,void (*visit)(VertexType))
+// 辅助函数：递归进行深度优先搜索
+void DFS(ALGraph &G, int v, int visited[], void (*visit)(VertexType)) {
+    // 访问当前顶点
+    if(visit != NULL)
+        visit(G.vertices[v].data);
+    visited[v] = true;
+    
+    // 遍历当前顶点的所有邻接顶点
+    ArcNode *p = G.vertices[v].firstarc;
+    while (p != NULL) {
+        // 如果邻接顶点未被访问，则递归访问它
+        if (!visited[p->adjvex]) {
+            DFS(G, p->adjvex, visited, visit);
+        }
+        p = p->nextarc;
+    }
+}
+
+status DFSTraverse(ALGraph &G, void (*visit)(VertexType))
 //对图G进行深度优先搜索遍历，依次对图中的每一个顶点使用函数visit访问一次，且仅访问一次
 {
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    if (G.vexnum == 0) return ERROR; // 如果图为空，返回错误
+    
+    // 初始化访问标记数组
+    int visited[MAX_VERTEX_NUM];
+    for (int i = 0; i < G.vexnum; i++) {
+        visited[i] = false;
+    }
+    
+    // 从每个未访问的顶点开始进行深度优先搜索
+    for (int i = 0; i < G.vexnum; i++) {
+        if (!visited[i]) {
+            DFS(G, i, visited, visit);
+        }
+    }
+    
+    return OK;
+    /********** End **********/
+}
 
+status BFSTraverse(ALGraph &G, void (*visit)(VertexType))
+//对图G进行广度优先搜索遍历，依次对图中的每一个顶点使用函数visit访问一次，且仅访问一次
+{
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    if (G.vexnum == 0) return ERROR; // 如果图为空，返回错误
+    
+    // 初始化访问标记数组
+    bool visited[MAX_VERTEX_NUM];
+    for (int i = 0; i < G.vexnum; i++) {
+        visited[i] = false;
+    }
+    
+    // 创建队列用于BFS
+    int queue[MAX_VERTEX_NUM];
+    int front = 0;
+    int rear = 0;
+    
+    // 从每个未访问的顶点开始进行广度优先搜索
+    for (int i = 0; i < G.vexnum; i++) {
+        if (!visited[i]) {
+            // 访问当前顶点
+            visit(G.vertices[i].data);
+            visited[i] = true;
+            
+            // 将当前顶点入队
+            queue[rear++] = i;
+            
+            // 队列非空时循环处理
+            while (front < rear) {
+                // 出队一个顶点
+                int v = queue[front++];
+                
+                // 访问该顶点的所有未访问邻接点
+                ArcNode *p = G.vertices[v].firstarc;
+                while (p != NULL) {
+                    int w = p->adjvex;
+                    if (!visited[w]) {
+                        visit(G.vertices[w].data);
+                        visited[w] = true;
+                        queue[rear++] = w; // 新发现的顶点入队
+                    }
+                    p = p->nextarc;
+                }
+            }
+
+        }
+    }
+
+    if(!flag) return ERROR;
+
+    // 删除第二个顶点的出边
+    p = G.vertices[loc2].firstarc;
+    p2 = NULL;
+
+    while(p != NULL)
+    {
+        if(p->adjvex == loc1)
+        {
+            if(p2 == NULL)  // 如果是第一条边
+            {
+                G.vertices[loc2].firstarc = p->nextarc;
+                free(p);
+                p = G.vertices[loc2].firstarc;
+            }
+            else  // 如果不是第一条边
+            {
+                p2->nextarc = p->nextarc;
+                free(p);
+                p = p2->nextarc;
+            }
+        }
+        else
+        {
+            p2 = p;
+            p = p->nextarc;
+        }
+    }
+
+    G.arcnum--;
+
+    return OK;
+
+    /********** End **********/
+}
+
+void PrintVertex(VertexType v)
+{
+    printf("Key: %d, Others: %s\n", v.key, v.others);
 }

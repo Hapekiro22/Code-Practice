@@ -4,7 +4,7 @@
 #define TRUE 1
 #define FALSE 0
 #define OK 1
-#define ERROR -1
+#define ERROR -32766
 #define INFEASIBLE -3
 #define OVERFLOW -2
 #define MAX_LISTS_NUM 20
