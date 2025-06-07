@@ -154,6 +154,48 @@ int NextAdjVex(ALGraph G,KeyType v,KeyType w)
         p = p -> nextarc;
     }
 
+=======
+    }
+
+    G.vertices[i].data = value;
+    return OK;
+
+    /********** End **********/
+}
+
+int FirstAdjVex(ALGraph G,KeyType u)
+//根据u在图G中查找顶点，查找成功返回顶点u的第一邻接顶点位序，否则返回-1；
+{
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    int i = GetLocation(G, u);
+    if(i == -1) return -1;
+
+    ArcNode *p = G.vertices[i].firstarc;
+    if(p == NULL) return -1;
+
+    return p -> adjvex;
+
+    /********** End **********/
+}
+
+int NextAdjVex(ALGraph G,KeyType v,KeyType w)
+//v对应G的一个顶点,w对应v的邻接顶点；操作结果是返回v的（相对于w）下一个邻接顶点的位序；如果w是最后一个邻接顶点，或v、w对应顶点不存在，则返回-1。
+{
+    // 请在这里补充代码，完成本关任务
+    /********** Begin *********/
+    int i = GetLocation(G, v);
+    int j = GetLocation(G, w);
+    if(i == -1) return -1;
+
+    ArcNode *p = G.vertices[i].firstarc;
+    while(p != NULL)
+    {
+        if(p -> adjvex == j)
+            break;
+        p = p -> nextarc;
+    }
+
     if(p == NULL || p -> nextarc == NULL) return -1;
   
     return p -> nextarc -> adjvex;
@@ -454,10 +496,44 @@ status BFSTraverse(ALGraph &G, void (*visit)(VertexType))
                     p = p->nextarc;
                 }
             }
+
         }
     }
-    
+
+    if(!flag) return ERROR;
+
+    // 删除第二个顶点的出边
+    p = G.vertices[loc2].firstarc;
+    p2 = NULL;
+
+    while(p != NULL)
+    {
+        if(p->adjvex == loc1)
+        {
+            if(p2 == NULL)  // 如果是第一条边
+            {
+                G.vertices[loc2].firstarc = p->nextarc;
+                free(p);
+                p = G.vertices[loc2].firstarc;
+            }
+            else  // 如果不是第一条边
+            {
+                p2->nextarc = p->nextarc;
+                free(p);
+                p = p2->nextarc;
+            }
+        }
+        else
+        {
+            p2 = p;
+            p = p->nextarc;
+        }
+    }
+
+    G.arcnum--;
+
     return OK;
+
     /********** End **********/
 }
 
@@ -465,4 +541,3 @@ void PrintVertex(VertexType v)
 {
     printf("Key: %d, Others: %s\n", v.key, v.others);
 }
-
