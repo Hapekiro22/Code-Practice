@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Experimental_Report.aux
+Reallocating 'name_of_file' (item size: 1) to 20 items.
+The style file: Experimental_Report.bst
+Illegal, another \bibstyle command---line 167 of file Experimental_Report.aux
+ : \bibstyle
+ :          {Experimental_Report}
+I'm skipping whatever remains of this command
+Reallocating 'name_of_file' (item size: 1) to 20 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Database file #1: Experimental_Report.bib
+Warning--Require address: Mehrabian1974An
+Warning--Require year: Mehrabian1974An
+You've used 1 entry,
+            3051 wiz_defined-function locations,
+            702 strings with 6024 characters,
+and the built_in function-call counts, 1432 in all, are:
+= -- 162
+> -- 2
+< -- 5
++ -- 157
+- -- 4
+* -- 30
+:= -- 187
+add.period$ -- 0
+call.type$ -- 1
+change.case$ -- 2
+chr.to.int$ -- 0
+cite$ -- 3
+duplicate$ -- 170
+empty$ -- 29
+format.name$ -- 4
+if$ -- 386
+int.to.chr$ -- 0
+int.to.str$ -- 1
+missing$ -- 0
+newline$ -- 30
+num.names$ -- 1
+pop$ -- 5
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 15
+stack$ -- 0
+substring$ -- 161
+swap$ -- 27
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 2
+while$ -- 7
+width$ -- 2
+write$ -- 38
+(There was 1 error message)

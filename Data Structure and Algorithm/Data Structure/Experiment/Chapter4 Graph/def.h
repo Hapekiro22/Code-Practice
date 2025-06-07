@@ -1,5 +1,6 @@
 	#include "stdio.h"
 	#include "stdlib.h"
+	#include "string.h"
 	#define TRUE 1
 	#define FALSE 0
 	#define OK 1
@@ -7,6 +8,7 @@
 	#define INFEASIBLE -1
 	#define OVERFLOW -2
 	#define MAX_VERTEX_NUM 20
+	#define MAX_ARC_NUM 100
 	typedef int status;
 	typedef int KeyType; 
    typedef enum {DG,DN,UDG,UDN} GraphKind;
@@ -29,3 +31,9 @@
         int vexnum,arcnum;   	  //顶点数、弧数
         GraphKind  kind;        //图的类型
        } ALGraph;
+
+	typedef struct {
+		ALGraph Ggroup[MAX_VERTEX_NUM];
+		int Gnum;
+		char name[MAX_VERTEX_NUM][20];
+	}	GraphGroup;
